@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.media.MediaView?>
+
+<BorderPane stylesheets="@" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="oop.fiveonethree.controller.MediaController">
+    <top>
+        <MenuBar fx:id="menuBar" prefHeight="25.0">
+            <Menu mnemonicParsing="false" text="文件">
+                <MenuItem mnemonicParsing="false" onAction="#openFile" text="打开"/>
+                <MenuItem mnemonicParsing="false" onAction="#exitPlayer" text="关闭"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="字幕">
+                <MenuItem mnemonicParsing="false" onAction="#addSubs" text="添加"/>
+            </Menu>
+        </MenuBar>
+
+        <Button text="打开媒体库" id="playlist" fx:id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />
+    </top>
+
+    <center>
+        <MediaView fx:id="mediaView" fitHeight="300.0" fitWidth="600.0" BorderPane.alignment="CENTER" />
+    </center>
+
+    <bottom>
+        <HBox id="control-bar" fx:id="mediaControl" prefHeight="50.0" prefWidth="500.0" spacing="5.0" style="-fx-background-color: #3E3E3E;" BorderPane.alignment="CENTER_LEFT">
+            <padding>
+                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+            </padding>
+            <children>
+                <Button id="play" fx:id="playAndPause" mnemonicParsing="false" onAction="#playAction" prefHeight="38.0" prefWidth="37.0" />
+                <Button id="stop" fx:id="stop" mnemonicParsing="false" onAction="#stopAction" />
+
+                <Label id="timeLabel" prefHeight="16.0" prefWidth="46.0" text="Time : ">
+                    <HBox.margin>
+                        <Insets top="10.0" />
+                    </HBox.margin>
+                </Label>
+                <Slider fx:id="timeSlider" maxHeight="-Infinity" maxWidth="-Infinity"
+                        minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="138.0"/>
+
+                <Label id="timeLabel" fx:id="currentTime" prefHeight="16.0" prefWidth="130.0" text="00:00:00 / 00:00:00">
+                    <HBox.margin>
+                        <Insets top="10.0" />
+                    </HBox.margin>
+                </Label>
+
+                <ToggleButton id="volume" fx:id="volume" mnemonicParsing="false" onAction="#muteUnmute">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="group" />
+                    </toggleGroup>
+                </ToggleButton>
+                <Slider fx:id="volumeSlider" maxHeight="-Infinity" maxWidth="-Infinity"
+                        minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="130.0"/>
+            </children>
+        </HBox>
+    </bottom>
+
+</BorderPane>
