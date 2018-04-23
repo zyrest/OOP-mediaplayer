@@ -9,7 +9,7 @@ import oop.fiveonethree.utils.FileUtil;
 public class FileTest {
 
     public static void main(String[] args) {
-        String file = "gun.sds.ds.test.mp3";
+        String file = "gun.sds.ds.test.mp6";
 
         System.out.println(FileUtil.isAudio(file));
     }

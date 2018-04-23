@@ -1,9 +1,15 @@
 package oop.fiveonethree.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import oop.fiveonethree.utils.PropertiesUtil;
+
+import java.nio.file.Path;
 
 /**
  * Created by ZhouYing.
@@ -48,4 +54,18 @@ public class MediaController {
 
     @FXML
     private Slider volumeSlider;
+
+    /**
+     * top action
+     */
+    @FXML
+    void openFile(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Files", PropertiesUtil.readFormats())
+        );
+        Window theWindow = ((MenuItem) event.getSource()).getParentPopup().getScene().getWindow();
+        Path theFile = chooser.showOpenDialog(theWindow).toPath();
+        String filePath = theFile.toString();
+    }
 }

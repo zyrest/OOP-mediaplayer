@@ -5,8 +5,8 @@ package oop.fiveonethree.utils;
  * www.zhouying.xyz
  */
 public class FileUtil {
-    private static String audioPostfix[] = {"mp3", "wav"};
-    private static String videoPostfix[] = {"mp4", "avi"};
+    private static String[] audioPostfix = (String[]) PropertiesUtil.readAudioPostfixs().toArray();
+    private static String[] videoPostfix = (String[]) PropertiesUtil.readVideoPostfixs().toArray();
 
     public static boolean isAudio(String fileName) {
         String type = getFilePostfix(fileName);
