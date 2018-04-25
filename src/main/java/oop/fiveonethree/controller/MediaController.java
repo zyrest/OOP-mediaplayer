@@ -61,9 +61,6 @@ public class MediaController {
     private Label timeLabel;
 
     @FXML
-    private Label currentTime;
-
-    @FXML
     private ToggleButton volume;
 
     @FXML
@@ -75,6 +72,13 @@ public class MediaController {
     private boolean pauseRequest = false;
     // 视频时长
     private Duration duration;
+
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     /**
      * top action
      */
@@ -122,7 +126,7 @@ public class MediaController {
 
             mediaPlayer.play();
             // 缩放时保持比例
-            mediaView.setPreserveRatio(true);
+            mediaView.setPreserveRatio(false);
             mediaView.autosize();
 
         } catch (UnsupportedEncodingException e) {
@@ -214,5 +218,20 @@ public class MediaController {
                 }
             });
         }
+    }
+
+    public void addSubs(ActionEvent event) {
+    }
+
+    public void openPlaylist(ActionEvent event) {
+    }
+
+    public void playAction(ActionEvent event) {
+    }
+
+    public void stopAction(ActionEvent event) {
+    }
+
+    public void muteUnmute(ActionEvent event) {
     }
 }

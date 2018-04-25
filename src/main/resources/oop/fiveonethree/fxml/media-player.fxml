@@ -18,7 +18,7 @@
             </Menu>
         </MenuBar>
 
-        <Button text="打开媒体库" id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />
+        <!--<Button text="打开媒体库" id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />-->
     </top>
 
     <center>

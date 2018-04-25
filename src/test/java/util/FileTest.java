@@ -1,6 +1,8 @@
 package util;
 
-import java.net.URLEncoder;
+import oop.fiveonethree.utils.PropertiesUtil;
+
+import java.util.List;
 
 /**
  * Created by ZhouYing.
@@ -9,11 +11,17 @@ import java.net.URLEncoder;
 public class FileTest {
 
     public static void main(String[] args) throws Exception {
-        String file = "gun.sds.ds.test.mp6";
+        List ls = PropertiesUtil.readPostfixs();
+        System.out.println(ls);
 
-        String str = "/";
-        System.out.println(URLEncoder.encode(str, "UTF-8"));
+        ls = PropertiesUtil.readAudioPostfixs();
+        System.out.println(ls);
 
+        ls = PropertiesUtil.readVideoPostfixs();
+        System.out.println(ls);
+
+        ls = PropertiesUtil.readFormats();
+        System.out.println(ls);
 //        System.out.println(FileUtil.isAudio(file));
     }
 }
