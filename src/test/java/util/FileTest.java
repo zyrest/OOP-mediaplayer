@@ -1,6 +1,7 @@
 package util;
 
 import oop.fiveonethree.utils.PropertiesUtil;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -23,5 +24,10 @@ public class FileTest {
         ls = PropertiesUtil.readFormats();
         System.out.println(ls);
 //        System.out.println(FileUtil.isAudio(file));
+    }
+
+    @Test
+    public void test() {
+        System.out.println("hahaha");
     }
 }

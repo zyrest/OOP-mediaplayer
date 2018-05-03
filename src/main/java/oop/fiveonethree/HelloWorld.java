@@ -5,12 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 import oop.fiveonethree.controller.MediaController;
 
 /**
  * Created by ZhouYing.
  * www.zhouying.xyz
  */
+@Log4j2
 public class HelloWorld extends Application {
 
     @Override
@@ -26,7 +28,7 @@ public class HelloWorld extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        log.info("Hello OOP!");
         launch(args);
     }
 }
