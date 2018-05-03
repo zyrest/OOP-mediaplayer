@@ -44,7 +44,11 @@
             <Slider fx:id="timeSlider" maxHeight="-Infinity" maxWidth="-Infinity"
                     minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="138.0"/>
 
-            <ToggleButton id="volume" fx:id="volume" mnemonicParsing="false" onAction="#muteUnmute" />
+            <ToggleButton id="volume" fx:id="volume" mnemonicParsing="false" onAction="#muteAction">
+                <toggleGroup>
+                    <ToggleGroup fx:id="group" />
+                </toggleGroup>
+            </ToggleButton>
 
             <Slider fx:id="volumeSlider" maxHeight="-Infinity" maxWidth="-Infinity"
                     minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="130.0"/>

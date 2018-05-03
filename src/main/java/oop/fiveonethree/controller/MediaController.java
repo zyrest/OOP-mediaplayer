@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import lombok.extern.log4j.Log4j2;
 import oop.fiveonethree.utils.DateTimeUtil;
 import oop.fiveonethree.utils.PropertiesUtil;
 
@@ -26,7 +27,9 @@ import java.nio.file.Paths;
  * Created by ZhouYing.
  * www.zhouying.xyz
  */
+@Log4j2
 public class MediaController {
+
     /**
      * top
      */
@@ -61,6 +64,9 @@ public class MediaController {
     private ToggleButton volume;
 
     @FXML
+    public ToggleGroup group;
+
+    @FXML
     private Slider volumeSlider;
 
     // 此列表在变化时可以被 listener 监听
@@ -69,9 +75,11 @@ public class MediaController {
     private boolean pauseRequest = false;
     // 视频时长
     private Duration duration;
+    // 是否在最后
+    private boolean atEndOfMedia = false;
 
+    private int previousVolume = 0;
     private Stage stage;
-
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -98,9 +106,74 @@ public class MediaController {
 
     @FXML
     void exitPlayer(ActionEvent event) {
-
+        stage.close();
     }
 
+    @FXML
+    public void addSubs(ActionEvent event) {
+    }
+
+    @FXML
+    public void openPlaylist(ActionEvent event) {
+    }
+
+    /**
+     *  Bottom
+     */
+    @FXML
+    void playAction(ActionEvent event) {
+        MediaPlayer player = mediaView.getMediaPlayer();
+
+        if (player != null) {
+            MediaPlayer.Status nowStatus = player.getStatus();
+
+            // 当前
+            if (nowStatus == MediaPlayer.Status.UNKNOWN || nowStatus == MediaPlayer.Status.HALTED) {
+                return;
+            } else if (nowStatus == MediaPlayer.Status.PAUSED ||
+                    nowStatus == MediaPlayer.Status.READY ||
+                    nowStatus == MediaPlayer.Status.STOPPED) {
+
+                if (atEndOfMedia) {
+                    player.seek(player.getStartTime());
+                    atEndOfMedia = false;
+                }
+                player.play();
+            } else {
+                player.pause();
+            }
+
+        } else {
+            event.consume();
+        }
+    }
+
+    @FXML
+    void stopAction(ActionEvent event) {
+        MediaPlayer player = mediaView.getMediaPlayer();
+        if (player != null) {
+            player.stop();
+            playAndPause.setId("play");
+        } else {
+            event.consume();
+        }
+    }
+
+    @FXML
+    void muteAction(ActionEvent event) {
+        if (volumeSlider.valueProperty().intValue() == 0) {
+            log.debug("当前已经静音，恢复原来的音量");
+            volumeSlider.valueProperty().setValue(previousVolume);
+        } else {
+            log.debug("静音成功！！");
+            previousVolume = volumeSlider.valueProperty().intValue();
+            volumeSlider.valueProperty().setValue(0);
+        }
+    }
+
+    /**
+     * 与视图逻辑不相关的一些方法
+     */
     private void playMedia(String filePath) {
         try {
             String encodedUrl = URLEncoder.encode(filePath, "UTF-8");
@@ -133,7 +206,7 @@ public class MediaController {
 
     private void checkAndStopMedia() {
         if (mediaView.getMediaPlayer() != null) {
-            // todo stop action
+            stopAction(null);
             mediaView.setMediaPlayer(null);
         }
     }
@@ -172,6 +245,7 @@ public class MediaController {
         // 主要作用为 拖动进度条时，改变视频位置
         timeSlider.valueProperty().addListener((observable -> {
             if (timeSlider.isValueChanging()) {
+//                log.debug("拖动进度条时，改变视频位置");
                 // slider 默认值为 0-100 故除100 得到百分比，乘duration则为拖动到的时间
                 mediaPlayer.seek(duration.multiply(timeSlider.valueProperty().getValue() / 100.0));
             }
@@ -179,14 +253,13 @@ public class MediaController {
 
         // 拖动音量进度条
         volumeSlider.valueProperty().addListener((observable -> {
-            if (volumeSlider.isValueChanging()) {
-                Double nowVolume = volumeSlider.valueProperty().getValue();
-                if (nowVolume > 0) volume.setSelected(false);
-                else if (nowVolume == 0) volume.setSelected(true);
+            Double nowVolume = volumeSlider.valueProperty().getValue();
+            // log.debug("正在拖动音量进度条，当前音量为->{}", nowVolume);
+            if (nowVolume > 0) volume.setSelected(false);
+            else if (nowVolume == 0) volume.setSelected(true);
 
-                // 设置当前播放的音量
-                mediaPlayer.setVolume(nowVolume / 100.0);
-            }
+            // 设置当前播放的音量
+            mediaPlayer.setVolume(nowVolume / 100.0);
         }));
     }
 
@@ -206,29 +279,15 @@ public class MediaController {
                 // 进度条未被禁用（可获取总时长），并且用户没有拖动时间条
                 // 即 视频正常播放。此时修改进度条
                 if (!timeSlider.isDisabled() && duration.greaterThan(Duration.ZERO) && !timeSlider.isValueChanging()) {
+//                    log.debug("视频正常播放。此时修改进度条");
                     timeSlider.valueProperty().setValue(currentTime.divide(duration.toMillis()).toMillis() * 100.0);
                 }
 
                 //
                 if (!volumeSlider.isValueChanging()) {
-                    volumeSlider.valueProperty().setValue((int) mediaPlayer.getVolume() * 100);
+                    volumeSlider.valueProperty().setValue((int) (mediaPlayer.getVolume() * 100));
                 }
             });
         }
-    }
-
-    public void addSubs(ActionEvent event) {
-    }
-
-    public void openPlaylist(ActionEvent event) {
-    }
-
-    public void playAction(ActionEvent event) {
-    }
-
-    public void stopAction(ActionEvent event) {
-    }
-
-    public void muteUnmute(ActionEvent event) {
     }
 }

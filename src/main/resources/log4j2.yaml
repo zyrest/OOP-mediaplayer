@@ -1,5 +1,5 @@
 Configuration:
-  status: warn
+  status: info
 
   Properties: # 定义全局变量
     Property: # 缺省配置（用于开发环境）。其他环境需要在VM参数中指定，如下：
@@ -8,7 +8,7 @@ Configuration:
       - name: log.level.console
         value: trace
       - name: log.level.oop
-        value: info
+        value: trace
       - name: log.path
         value: logs
       - name: project.name
