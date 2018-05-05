@@ -27,7 +27,7 @@ public class HelloWorld extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         log.info("Hello OOP!");
         launch(args);
     }

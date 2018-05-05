@@ -79,6 +79,7 @@ public class MediaController {
     private boolean atEndOfMedia = false;
 
     private int previousVolume = 0;
+
     private Stage stage;
     public void setStage(Stage stage) {
         this.stage = stage;
