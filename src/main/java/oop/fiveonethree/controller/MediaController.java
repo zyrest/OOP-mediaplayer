@@ -1,10 +1,16 @@
 package oop.fiveonethree.controller;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
@@ -19,16 +25,18 @@ import oop.fiveonethree.utils.DateTimeUtil;
 import oop.fiveonethree.utils.PropertiesUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 /**
  * Created by ZhouYing.
  * www.zhouying.xyz
  */
 @Log4j2
-public class MediaController {
+public class MediaController implements Initializable {
 
     /**
      * top
@@ -64,26 +72,37 @@ public class MediaController {
     private ToggleButton volume;
 
     @FXML
-    public ToggleGroup group;
+    private ToggleGroup group;
 
     @FXML
     private Slider volumeSlider;
 
-    // 此列表在变化时可以被 listener 监听
-    private ObservableList mediaFiles = FXCollections.observableArrayList();
-    // 有无暂停请求
-    private boolean pauseRequest = false;
     // 视频时长
     private Duration duration;
+
+    // 此列表在变化时可以被 listener 监听
+    private ObservableList mediaFiles = FXCollections.observableArrayList();
+
+    private ObjectProperty<oop.fiveonethree.model.Media> selectedMedia = new SimpleObjectProperty<>();
+    private ObjectProperty<oop.fiveonethree.model.Media> deletedMedia = new SimpleObjectProperty<>();
+
+    // 有无暂停请求
+    private boolean pauseRequest = false;
     // 是否在最后
     private boolean atEndOfMedia = false;
-
+    // 用于静音按键，记录之前的音量
     private int previousVolume = 0;
 
     private Stage stage;
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
+    private PlaylistController playlistController;
+    private Scene playlistScene;
+
+    // 一个隐藏动画，用于控制全屏时，控制栏的隐藏
+    private FadeTransition ft;
 
     /**
      * top action
@@ -92,13 +111,17 @@ public class MediaController {
     void openFile(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Files", PropertiesUtil.readFormats())
+                new FileChooser.ExtensionFilter("媒体文件", PropertiesUtil.readFormats())
         );
         Window theWindow = ((MenuItem) event.getSource()).getParentPopup().getScene().getWindow();
         Path theFile = chooser.showOpenDialog(theWindow).toPath();
         String filePath = theFile.toString();
-        if (!mediaFiles.contains(theFile)){
-            mediaFiles.add(theFile);
+
+        oop.fiveonethree.model.Media media = new oop.fiveonethree.model.Media();
+        media.setName(theFile.getFileName().toString());
+        media.setUrl(filePath);
+        if (!mediaFiles.contains(media)) {
+            mediaFiles.add(media);
             playMedia(filePath);
         } else {
             playMedia(filePath);
@@ -110,12 +133,22 @@ public class MediaController {
         stage.close();
     }
 
+    // todo!!!
     @FXML
     public void addSubs(ActionEvent event) {
     }
 
     @FXML
     public void openPlaylist(ActionEvent event) {
+        Stage stage = new Stage();
+        stage.setScene(playlistScene);
+        stage.initOwner( ((Button) event.getSource()).getScene().getWindow() );
+        stage.show();
+        // 使得两个Controller中的list值同步 -> 双向绑定
+        Bindings.bindContentBidirectional(mediaFiles, playlistController.listViewItems());
+        // 使得本Controller随Playerlist改变而改变，单向绑定，该值无法在本类中被修改！！
+        selectedMedia.bind(playlistController.selectedFile());
+        deletedMedia.bind(playlistController.deletedFile());
     }
 
     /**
@@ -170,6 +203,24 @@ public class MediaController {
             previousVolume = volumeSlider.valueProperty().intValue();
             volumeSlider.valueProperty().setValue(0);
         }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        // 下方控制栏的隐藏！
+        ft = new FadeTransition(Duration.millis(2000), mediaControl);
+        ft.setFromValue(1.0);
+        ft.setToValue(0.0);
+        ft.setCycleCount(1);
+
+        selectedMedia.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) playMedia(newValue.getUrl());
+        });
+
+        deletedMedia.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) stopAction(null);
+        });
     }
 
     /**
@@ -262,8 +313,9 @@ public class MediaController {
             // 设置当前播放的音量
             mediaPlayer.setVolume(nowVolume / 100.0);
         }));
-    }
 
+        // todo ! 全屏控制！
+    }
 
     /**
      * 一旦播放时间更新，则去更新其他按键、slider等等的信息
@@ -291,4 +343,6 @@ public class MediaController {
             });
         }
     }
+
+
 }

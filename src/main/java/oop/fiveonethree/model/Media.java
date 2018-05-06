@@ -13,4 +13,8 @@ public class Media {
     private String url;
 
     private String name;
+
+    public String toString() {
+        return name;
+    }
 }

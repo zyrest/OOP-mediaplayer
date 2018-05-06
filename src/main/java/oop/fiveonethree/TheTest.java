@@ -1,8 +1,7 @@
 package oop.fiveonethree;
 
-import oop.fiveonethree.mapper.PlayerListMapper;
-import oop.fiveonethree.mapper.PlayerListRepository;
-import oop.fiveonethree.model.Media;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * Created by ZhouYing.
@@ -10,11 +9,19 @@ import oop.fiveonethree.model.Media;
  */
 public class TheTest {
     public static void main(String[] args) {
-        PlayerListMapper p = new PlayerListRepository();
-        Media m = p.selectMedias().get(1);
-        m.setName("yoyoyo");
-        p.deleteMediaById(m);
+        StringProperty prop1 = new SimpleStringProperty("qwer");
+        StringProperty prop2 = new SimpleStringProperty("");
 
-        System.out.println(p.selectMedias());
+        prop2.bind(prop1);
+
+
+        System.out.println("prop1.isBound() = " + prop1.isBound());
+        System.out.println("prop2.isBound() = " + prop2.isBound());
+
+        prop1.set("asdf");
+        System.out.println(prop2.get());
+
+        prop2.set("blablabla");
+        System.out.println(prop1.get());
     }
 }

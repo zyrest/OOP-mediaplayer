@@ -15,6 +15,16 @@ import java.util.List;
 @Log4j2
 public class PlayerListRepository implements PlayerListMapper {
 
+    private static class SingletonHolder {
+        private static final PlayerListRepository INSTANCE = new PlayerListRepository();
+    }
+
+    private PlayerListRepository(){}
+
+    public static PlayerListRepository getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
     @Override
     public boolean addMedia(Media media) {
         boolean flag = false;
@@ -22,7 +32,7 @@ public class PlayerListRepository implements PlayerListMapper {
 
         try {
             PreparedStatement stat = c.prepareStatement("insert into mediaList (id, url, name) values (?, ?, ?);");
-            stat.setInt(1, getNextId());
+            stat.setInt(1, media.getId());
             stat.setString(2, media.getUrl());
             stat.setString(3, media.getName());
             stat.execute();
@@ -92,7 +102,7 @@ public class PlayerListRepository implements PlayerListMapper {
         return ans;
     }
 
-    private int getNextId() {
+    public int getNextId() {
         int ans = 0;
 
         Connection c = DatabaseUtil.getConnection();

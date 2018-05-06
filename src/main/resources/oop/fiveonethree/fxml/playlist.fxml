@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0"
+      prefWidth="211.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="oop.fiveonethree.controller.PlaylistController">
+
+    <ListView fx:id="playList" prefHeight="233.0" prefWidth="211.0" VBox.vgrow="ALWAYS"/>
+    <HBox alignment="CENTER" prefHeight="54.0" prefWidth="211.0">
+        <Button id="add" mnemonicParsing="false" onAction="#add"/>
+        <Button id="delete" mnemonicParsing="false" onAction="#delete"/>
+    </HBox>
+</VBox>

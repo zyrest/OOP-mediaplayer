@@ -17,4 +17,6 @@ public interface PlayerListMapper {
     boolean updateMediaById(Media media);
 
     List<Media> selectMedias();
+
+    int getNextId();
 }
