@@ -389,6 +389,7 @@ public class MediaController implements Initializable {
                     for (Path path : paths) {
                         String format = path.toAbsolutePath().toString();
                         format = format.substring(format.lastIndexOf('.')+1);
+//                        log.debug("what is the format : {}", format);
                         if (PropertiesUtil.readPostfixs().contains(format)) {
                             if (mediaView.getMediaPlayer() != null) mediaView.getMediaPlayer().stop();
                             oop.fiveonethree.model.Media m = new oop.fiveonethree.model.Media();
@@ -396,8 +397,6 @@ public class MediaController implements Initializable {
                             m.setName(path.toAbsolutePath().getFileName().toString());
                             mediaFiles.add(m);
                             playMedia(path.toAbsolutePath().toString());
-                        } else {
-                            // todo!!
                         }
                     }
                 }
@@ -448,7 +447,7 @@ public class MediaController implements Initializable {
 
     /**
      *  当移动到控制栏的时候，保持控制栏，不隐藏
-     * @param node
+     * @param node 传入MediaControl
      */
     private void applyControlHiding(Node node) {
         if (node instanceof Parent) {
