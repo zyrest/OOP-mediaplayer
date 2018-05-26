@@ -3,6 +3,7 @@ package oop.fiveonethree.controller;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -10,8 +11,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -22,6 +26,7 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 import lombok.extern.log4j.Log4j2;
 import oop.fiveonethree.utils.DateTimeUtil;
+import oop.fiveonethree.utils.FileUtil;
 import oop.fiveonethree.utils.PropertiesUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -29,6 +34,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -164,7 +170,8 @@ public class MediaController implements Initializable {
             // 当前
             if (nowStatus == MediaPlayer.Status.UNKNOWN || nowStatus == MediaPlayer.Status.HALTED) {
                 return;
-            } else if (nowStatus == MediaPlayer.Status.PAUSED ||
+            }
+            if (nowStatus == MediaPlayer.Status.PAUSED ||
                     nowStatus == MediaPlayer.Status.READY ||
                     nowStatus == MediaPlayer.Status.STOPPED) {
 
@@ -229,13 +236,13 @@ public class MediaController implements Initializable {
     private void playMedia(String filePath) {
         try {
             String encodedUrl = URLEncoder.encode(filePath, "UTF-8");
-            // todo 空格编码？
             encodedUrl = encodedUrl.replace("+", "%20");
             encodedUrl = "file:/" + encodedUrl;
 
+            checkAndStopMedia();
+
             // 找到该媒体文件的位置，并拉入程序
             Media media = new Media(encodedUrl);
-            checkAndStopMedia();
             MediaPlayer mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
             // 此方法为 player 绑定一些监听器
@@ -248,7 +255,7 @@ public class MediaController implements Initializable {
 
             mediaPlayer.play();
             // 缩放时保持比例
-            mediaView.setPreserveRatio(false);
+            mediaView.setPreserveRatio(true);
             mediaView.autosize();
 
         } catch (UnsupportedEncodingException e) {
@@ -314,7 +321,7 @@ public class MediaController implements Initializable {
             mediaPlayer.setVolume(nowVolume / 100.0);
         }));
 
-        // todo ! 全屏控制！
+        onFullScreenHideControl((Stage) mediaView.getScene().getWindow());
     }
 
     /**
@@ -344,5 +351,127 @@ public class MediaController implements Initializable {
         }
     }
 
+    public DoubleProperty timeSliderWidth() {
+        return timeSlider.prefWidthProperty();
+    }
+    public DoubleProperty mediaViewHeight() {
+        return mediaView.fitHeightProperty();
+    }
+    public DoubleProperty mediaViewWidth() {
+        return mediaView.fitWidthProperty();
+    }
 
+    public void invokePlayListController(PlaylistController controller) {
+        this.playlistController = controller;
+    }
+
+    public void invokePlayListRoot(Parent root) {
+        this.playlistScene = new Scene(root);
+    }
+
+    public void applyDragDrop(Scene scene) {
+        try {
+            applyControlHiding(mediaControl);
+
+            scene.setOnDragOver((dragEvent) -> {
+                Dragboard board = dragEvent.getDragboard();
+                if (board.hasFiles()) {
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                } else {
+                    dragEvent.consume();
+                }
+            });
+
+            scene.setOnDragDropped((dragEvent) -> {
+                Dragboard board = dragEvent.getDragboard();
+                if (board.hasFiles()) {
+                    List<Path> paths = FileUtil.convertFileToPath(board.getFiles());
+                    for (Path path : paths) {
+                        String format = path.toAbsolutePath().toString();
+                        format = format.substring(format.lastIndexOf('.')+1);
+                        if (PropertiesUtil.readPostfixs().contains(format)) {
+                            if (mediaView.getMediaPlayer() != null) mediaView.getMediaPlayer().stop();
+                            oop.fiveonethree.model.Media m = new oop.fiveonethree.model.Media();
+                            m.setUrl(path.toAbsolutePath().toString());
+                            m.setName(path.toAbsolutePath().getFileName().toString());
+                            mediaFiles.add(m);
+                            playMedia(path.toAbsolutePath().toString());
+                        } else {
+                            // todo!!
+                        }
+                    }
+                }
+            });
+
+            // 控制 ESC 键退出全屏状态
+            scene.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    ( (Stage)scene.getWindow() ).setFullScreen(false);
+                }
+            });
+
+            // 双击进入、退出全屏
+            mediaView.addEventFilter(MouseEvent.MOUSE_PRESSED, (mouseEvent) -> {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    if (mouseEvent.getClickCount() == 2) {
+                        boolean nextFull = ! ((Stage) scene.getWindow()).isFullScreen();
+                        ((Stage) scene.getWindow()).setFullScreen(nextFull);
+                    }
+                }
+            });
+
+            scene.addEventFilter(MouseEvent.MOUSE_MOVED, (mouseEvent) -> {
+                if (stage.isFullScreen()) { // 全屏移动鼠标，短暂显示控制栏
+                    showTempMediaControlBar();
+                } else {
+                    showConstantMediaControlBar();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showTempMediaControlBar() {
+        // 立刻显示
+        menuBar.setOpacity(0);
+        mediaControl.setOpacity(1.0);
+        // 缓慢消失
+        ft.play();
+    }
+
+    private void showConstantMediaControlBar() {
+        menuBar.setOpacity(1);
+        ft.stop();
+        mediaControl.setOpacity(1.0);
+    }
+
+    /**
+     *  当移动到控制栏的时候，保持控制栏，不隐藏
+     * @param node
+     */
+    private void applyControlHiding(Node node) {
+        if (node instanceof Parent) {
+            ((Parent) node).getChildrenUnmodifiable().forEach(this::applyControlHiding);
+        }
+        node.setOnMouseMoved(mouseEvent -> {
+            if (mouseEvent.getX() > 0) {
+                showConstantMediaControlBar();
+            }
+        });
+    }
+
+    private void onFullScreenHideControl(Stage stage) {
+        try {
+            stage.fullScreenProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    showTempMediaControlBar();
+                } else {
+                    showConstantMediaControlBar();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

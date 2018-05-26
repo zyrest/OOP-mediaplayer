@@ -15,6 +15,7 @@
             </Menu>
             <Menu mnemonicParsing="false" text="字幕">
                 <MenuItem mnemonicParsing="false" onAction="#addSubs" text="添加"/>
+                <MenuItem mnemonicParsing="false" onAction="#openPlaylist" text="媒体库"/>
             </Menu>
         </MenuBar>
 
@@ -36,7 +37,7 @@
                     prefWidth="37.0"/>
             <Button id="stop" fx:id="stop" mnemonicParsing="false" onAction="#stopAction"/>
 
-            <Label id="timeLabel" fx:id="timeLabel" prefHeight="16.0" prefWidth="46.0" text="00:00:00 / 00:00:00">
+            <Label id="timeLabel" fx:id="timeLabel" prefHeight="16.0" prefWidth="200.0" text="00:00:00 / 00:00:00">
                 <HBox.margin>
                     <Insets top="10.0"/>
                 </HBox.margin>
