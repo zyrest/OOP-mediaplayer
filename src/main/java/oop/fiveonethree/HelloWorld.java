@@ -21,11 +21,10 @@ public class HelloWorld extends Application {
      * @param scene
      */
     private void bindSize(MediaController controller, Scene scene){
-        controller.timeSliderWidth().bind(scene.widthProperty().subtract(300));
+        controller.timeSliderWidth().bind(scene.widthProperty().subtract(440));
         controller.mediaViewWidth().bind(scene.widthProperty());
         controller.mediaViewHeight().bind(scene.heightProperty().subtract(70));
     }
-
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -44,8 +43,6 @@ public class HelloWorld extends Application {
         controller.setStage(primaryStage);
         bindSize(controller, scene);
         primaryStage.show();
-
-
     }
 
     public static void main(String[] args) throws Exception {

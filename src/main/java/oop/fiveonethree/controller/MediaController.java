@@ -56,6 +56,9 @@ public class MediaController implements Initializable {
     @FXML
     private MediaView mediaView;
 
+    @FXML
+    private Label subLabel;
+
     /**
      * bottom
      */
@@ -63,7 +66,7 @@ public class MediaController implements Initializable {
     private HBox mediaControl;
 
     @FXML
-    private Button playAndPause;
+    private Button play;
 
     @FXML
     private Button stop;
@@ -89,8 +92,8 @@ public class MediaController implements Initializable {
     // 此列表在变化时可以被 listener 监听
     private ObservableList mediaFiles = FXCollections.observableArrayList();
 
-    private ObjectProperty<oop.fiveonethree.model.Media> selectedMedia = new SimpleObjectProperty<>();
-    private ObjectProperty<oop.fiveonethree.model.Media> deletedMedia = new SimpleObjectProperty<>();
+    private ObjectProperty<Path> selectedMedia = new SimpleObjectProperty<>();
+    private ObjectProperty<Path> deletedMedia = new SimpleObjectProperty<>();
 
     // 有无暂停请求
     private boolean pauseRequest = false;
@@ -123,11 +126,8 @@ public class MediaController implements Initializable {
         Path theFile = chooser.showOpenDialog(theWindow).toPath();
         String filePath = theFile.toString();
 
-        oop.fiveonethree.model.Media media = new oop.fiveonethree.model.Media();
-        media.setName(theFile.getFileName().toString());
-        media.setUrl(filePath);
-        if (!mediaFiles.contains(media)) {
-            mediaFiles.add(media);
+        if (!mediaFiles.contains(theFile)) {
+            mediaFiles.add(theFile);
             playMedia(filePath);
         } else {
             playMedia(filePath);
@@ -194,7 +194,7 @@ public class MediaController implements Initializable {
         MediaPlayer player = mediaView.getMediaPlayer();
         if (player != null) {
             player.stop();
-            playAndPause.setId("play");
+            play.setId("play");
         } else {
             event.consume();
         }
@@ -214,7 +214,6 @@ public class MediaController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         // 下方控制栏的隐藏！
         ft = new FadeTransition(Duration.millis(2000), mediaControl);
         ft.setFromValue(1.0);
@@ -222,7 +221,7 @@ public class MediaController implements Initializable {
         ft.setCycleCount(1);
 
         selectedMedia.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) playMedia(newValue.getUrl());
+            if (newValue != null) playMedia(newValue.toString());
         });
 
         deletedMedia.addListener((observable, oldValue, newValue) -> {
@@ -255,7 +254,7 @@ public class MediaController implements Initializable {
 
             mediaPlayer.play();
             // 缩放时保持比例
-            mediaView.setPreserveRatio(true);
+            mediaView.setPreserveRatio(false);
             mediaView.autosize();
 
         } catch (UnsupportedEncodingException e) {
@@ -287,12 +286,12 @@ public class MediaController implements Initializable {
                 mediaPlayer.pause();
                 pauseRequest = false;
             } else {
-                playAndPause.setId("pause");
+                play.setId("pause");
             }
         });
 
         // 正在暂停时 开一个线程
-        mediaPlayer.setOnPaused(() -> playAndPause.setId("play"));
+        mediaPlayer.setOnPaused(() -> play.setId("play"));
 
         // 准备就绪时 media 已经准备好了，更新页面信息
         mediaPlayer.setOnReady(() -> {

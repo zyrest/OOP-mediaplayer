@@ -5,7 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.media.MediaView?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane id="root" stylesheets="@../style/player.css"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="oop.fiveonethree.controller.MediaController">
     <top>
         <MenuBar fx:id="menuBar" prefHeight="25.0">
@@ -15,29 +16,29 @@
             </Menu>
             <Menu mnemonicParsing="false" text="字幕">
                 <MenuItem mnemonicParsing="false" onAction="#addSubs" text="添加"/>
-                <MenuItem mnemonicParsing="false" onAction="#openPlaylist" text="媒体库"/>
             </Menu>
         </MenuBar>
 
-        <!--<Button text="打开媒体库" id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />-->
     </top>
 
     <center>
-        <MediaView fx:id="mediaView" fitHeight="300.0" fitWidth="600.0" BorderPane.alignment="CENTER" />
+        <VBox>
+            <MediaView fx:id="mediaView" fitHeight="300.0" fitWidth="600.0" BorderPane.alignment="CENTER" />
+        </VBox>
     </center>
 
     <bottom>
         <HBox id="control-bar" fx:id="mediaControl" prefHeight="50.0" prefWidth="500.0" spacing="5.0"
               style="-fx-background-color: #3E3E3E;" BorderPane.alignment="CENTER_LEFT">
             <padding>
-                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0"/>
+                <Insets bottom="10.0" left="5.0" right="10.0" top="5.0"/>
             </padding>
 
-            <Button id="playAndPause" fx:id="playAndPause" mnemonicParsing="false" onAction="#playAction" prefHeight="38.0"
+            <Button id="play" fx:id="play" mnemonicParsing="false" onAction="#playAction" prefHeight="38.0"
                     prefWidth="37.0"/>
             <Button id="stop" fx:id="stop" mnemonicParsing="false" onAction="#stopAction"/>
 
-            <Label id="timeLabel" fx:id="timeLabel" prefHeight="16.0" prefWidth="200.0" text="00:00:00 / 00:00:00">
+            <Label id="timeLabel" fx:id="timeLabel" prefHeight="16.0" prefWidth="180.0" text="00:00:00 / 00:00:00">
                 <HBox.margin>
                     <Insets top="10.0"/>
                 </HBox.margin>
@@ -53,6 +54,9 @@
 
             <Slider fx:id="volumeSlider" maxHeight="-Infinity" maxWidth="-Infinity"
                     minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="130.0"/>
+
+
+            <Button id="playlist" mnemonicParsing="false" onAction="#openPlaylist" />
         </HBox>
     </bottom>
 
